@@ -1,1 +1,1 @@
-# Minesweeper-Solve
+# Minesweeper-Solver
