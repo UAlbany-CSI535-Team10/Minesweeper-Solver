@@ -46,11 +46,11 @@ def display_state(state):
       print('{:>{cs}}'.format(state[0][i][j], cs = cols_spacing), end='')
     print('')
 
-def play(x, y, state, board, flag=False):
-  if x < 0 or x > len(board) or y < 0 or y > len(board[0]):
+def play(row, col, state, board, flag=False):
+  rows, cols = len(board), len(board[0])
+  x, y = row, col
+  if x < 0 or x > rows or y < 0 or y > cols:
     print('Invalid coordinates!')
-    return False
-  if state[0][x][y] != '#': # previously clicked/recursively visited cell
     return False
   if board[x][y] > 8: # clicked on mine
     state[0][x][y] = 'X' if not flag else 'F'
@@ -60,16 +60,19 @@ def play(x, y, state, board, flag=False):
   if flag:
     print('No mine here!')
     return False
-  state[1] += 1
-  if board[x][y] > 0: # clicked on numbered cell
-    state[0][x][y] = board[x][y]
-    return False
-  # cell has no mine surrounding it 
-  state[0][x][y] = ''
-  rows, cols = len(state[0]), len(state[0][0])
-  # click on surrounding 8 cells
-  for i, j in surrounding_cells(x, y, rows, cols):
-    play(i, j, state, board)
+  queue = [[x, y]]
+  while queue:
+    x, y = queue.pop(0)
+    if state[0][x][y] != '#': # previously clicked/recursively visited cell
+      continue
+    state[1] += 1
+    if board[x][y] > 0: # clicked on numbered cell
+      state[0][x][y] = board[x][y]
+      continue
+    # cell has no mine surrounding it 
+    state[0][x][y] = ''
+    # click on surrounding 8 cells
+    queue += surrounding_cells(x, y, rows, cols)
   return False
 
 
@@ -88,8 +91,12 @@ def main():
   flag = False
   while not done:
     print('Click on ')
-    x = int(input('\tx: '))
-    y = int(input('\ty: '))
+    try:
+      x = int(input('\trow: '))
+      y = int(input('\tcol: '))
+    except ValueError as _:
+      print('Invalid input!')
+      continue
     done = play(x, y, state, board, flag)
     display_state(state)
     if (rows*cols - state[1]) == num_mines or state[2] == num_mines:
