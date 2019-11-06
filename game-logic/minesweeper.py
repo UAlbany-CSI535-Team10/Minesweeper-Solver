@@ -77,12 +77,13 @@ def ai_player(state):
     if state[0][i][j].isdigit():
       n = int(state[0][i][j])
       neighbors = [(x, y) for x, y in surrounding_cells(i, j, rows, cols) if state[0][x][y] == '#']
-      print
       for x, y in neighbors:
         numbered_cell_neighbors[(x, y)] += n/len(neighbors)
   print(len(numbered_cell_neighbors), numbered_cell_neighbors)
-  x, y = min(numbered_cell_neighbors, key=numbered_cell_neighbors.get)
-  return x, y
+  if numbered_cell_neighbors:
+    x, y = min(numbered_cell_neighbors, key=numbered_cell_neighbors.get)
+    return x, y
+  return 0, 0
 
 def autoplay(rows, cols, n):
   # rows = int(input('Enter rows: '))
@@ -119,7 +120,7 @@ def autoplay(rows, cols, n):
       return False
 
 def main():
-  n = 1
+  n = 500
   wins = 0
   losses = 0
   for _ in range(n):
