@@ -48,6 +48,19 @@ def display_state(state):
       print('{:>{cs}}'.format(state[0][i][j], cs = cols_spacing), end='')
     print('')
 
+def display_prob(state):
+  rows, cols = len(state[0]), len(state[0][0])
+  rows_spacing, cols_spacing = len(str(rows)) + 1 +6, len(str(cols)) + 1 +6
+  print('{:>{rs}}'.format(' ', rs=rows_spacing), end='')
+  for i in range(cols):
+    print('{:>{cs}}'.format(i+1, cs=cols_spacing), end='')
+  print('')
+  for i in range(rows):
+    print('{:>{rs}}'.format(i+1, rs=rows_spacing), end='')
+    for j in range(cols):
+      print('{:>{cs}.2f}'.format(state[0][i][j], cs = cols_spacing), end='')
+    print('')
+
 def play(row, col, state, board, flag=False):
   rows, cols = len(board), len(board[0])
   x, y = row, col
@@ -81,8 +94,6 @@ def ai_player(state, probabilties, explored, first=True):
   rows, cols = len(state[0]), len(state[0][0])
   if first:
     return randint(0, rows-1), randint(0, cols-1)
-  cell_prob = PriorityQueue()
-  cellp = []
   for i in range(rows):
     for j in range(cols):
       if state[0][i][j] == '':
@@ -91,6 +102,7 @@ def ai_player(state, probabilties, explored, first=True):
         for k, l in surrounding_cells(i, j, rows, cols):
           probabilties[k][l] = -100.0
       elif state[0][i][j].isdigit():
+        probabilties[i][j] = -100.0
         n = int(state[0][i][j])
         if explored[i][j] != 0:
           continue
@@ -98,11 +110,15 @@ def ai_player(state, probabilties, explored, first=True):
         cells = [[k, l] for k, l in surrounding_cells(i, j, rows, cols) if state[0][k][l] == '#']
         for k, l in cells:
           probabilties[k][l] += n/len(cells)
+  cell_prob = PriorityQueue()
+  cellp = []
+  for i in range(rows):
+    for j in range(cols):
       if probabilties[i][j] > 0:
         cell_prob.put([probabilties[i][j], (i, j)])
         cellp.append([probabilties[i][j], (i, j)])
   # print(cell_prob.get())
-  display_state([probabilties])
+  display_prob([probabilties])
   print(cellp)
   p, (x, y) = cell_prob.get()
   print(p)
@@ -126,13 +142,13 @@ def main():
   first = True
   # flag = False
   while not done:
-    print('Click on ')
+    # print('Click on ')
     try:
       # x = int(input('\trow: '))
       # y = int(input('\tcol: '))
       x, y = ai_player(state, probabilties, explored, first)
       first = False
-      print('Computer chose ', x, y)
+      print('Computer chose ', x+1, y+1)
     except ValueError as _:
       print('Invalid input!')
       continue
