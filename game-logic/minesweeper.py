@@ -69,7 +69,7 @@ def play(row, col, state, board, flag=False):
     queue += surrounding_cells(x, y, rows, cols)
   return False
 
-def ai_player(state):
+def ai_player(state, board):
   numbered_cell_neighbors = defaultdict(float)
   rows, cols = len(state[0]), len(state[0][0])
   # for i, j in itertools.product(range(rows), range(cols)):
@@ -77,6 +77,10 @@ def ai_player(state):
     if state[0][i][j].isdigit():
       n = int(state[0][i][j])
       neighbors = [(x, y) for x, y in surrounding_cells(i, j, rows, cols) if state[0][x][y] == '#']
+      if n == len(neighbors):
+        for x, y in neighbors:
+          play(x, y, state, board, True)
+        ai_player(state, board)
       for x, y in neighbors:
         numbered_cell_neighbors[(x, y)] += n/len(neighbors)
   print(len(numbered_cell_neighbors), numbered_cell_neighbors)
@@ -102,7 +106,7 @@ def autoplay(rows, cols, n):
     print('Computer plays', (x, y))
     done = play(x, y, state, board) #, flag)
     display_state(state)
-    x, y = ai_player(state)
+    x, y = ai_player(state, board)
     if (rows*cols - state[1]) == num_mines or state[2] == num_mines:
       print('Winner!')
       return True
@@ -120,7 +124,7 @@ def autoplay(rows, cols, n):
       return False
 
 def main():
-  n = 500
+  n = 100
   wins = 0
   losses = 0
   for _ in range(n):
