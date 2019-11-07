@@ -86,7 +86,7 @@ def ai_player(state, board):
         ai_player(state, board)
       for x, y in neighbors:
         numbered_cell_neighbors[(x, y)] += flags_neq_n * n/len(neighbors)
-  print(len(numbered_cell_neighbors), numbered_cell_neighbors)
+  # print(len(numbered_cell_neighbors), numbered_cell_neighbors)
   if numbered_cell_neighbors:
     x, y = min(numbered_cell_neighbors, key=numbered_cell_neighbors.get)
     return x, y
@@ -98,20 +98,29 @@ def autoplay(rows, cols, n):
   # n = int(input('Enter number of mines: '))
   board, mines = create_board(rows, cols, n)
   num_mines = len(mines)
-  display_state([board])
-  print(mines)
-  print('-'*30)
+  # display_state([board])
+  # print(mines)
+  # print('-'*30)
   state = [[['#']*cols for _ in range(rows)], 0, 0] # exposed grid, number of exposed cells, flagged mines
   done = False
   # flag = False
   x, y = randint(0, rows-1), randint(0, cols-1)
   while not done:
+<<<<<<< HEAD
     print('Computer plays', (x, y), 'Mines flagged: ', state[2])
+=======
+    # print('Computer plays', (x, y))
+>>>>>>> 8a76dccaf968f4199bed22da26124cc95aee505b
     done = play(x, y, state, board) #, flag)
-    display_state(state)
+    # display_state(state)
     x, y = ai_player(state, board)
+<<<<<<< HEAD
     if (rows*cols - state[1]) == num_mines or state[2] >= num_mines:
       print('Winner!')
+=======
+    if (rows*cols - state[1]) == num_mines or state[2] == num_mines:
+      # print('Winner!')
+>>>>>>> 8a76dccaf968f4199bed22da26124cc95aee505b
       return True
       # done = True
     elif not done:
@@ -123,18 +132,25 @@ def autoplay(rows, cols, n):
       # if option == 'F':
       #   flag = True
     else:
-      print('Game Over!')
+      # print('Game Over!')
       return False
 
 def main():
-  n = 100
+  n = 1000
   wins = 0
   losses = 0
+<<<<<<< HEAD
   for _ in range(n):
     if autoplay(10, 10, 15):
+=======
+  for i in range(n):
+    if autoplay(10, 10,20):
+>>>>>>> 8a76dccaf968f4199bed22da26124cc95aee505b
       wins += 1
     else:
       losses += 1
+    if (i%100)==0:
+      print(wins, losses, wins / n)
   print(wins, losses, wins/n)
 
 if __name__ == '__main__':
