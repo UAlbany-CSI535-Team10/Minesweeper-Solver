@@ -76,13 +76,16 @@ def ai_player(state, board):
   for i, j in np.ndindex((rows, cols)):
     if state[0][i][j].isdigit():
       n = int(state[0][i][j])
+      flags = [(x, y) for x, y in surrounding_cells(i, j, rows, cols) if state[0][x][y] == 'F']
+      flags_neq_n = -20 if n == len(flags) else 1
       neighbors = [(x, y) for x, y in surrounding_cells(i, j, rows, cols) if state[0][x][y] == '#']
-      if n == len(neighbors):
+      if (n - len(flags)) == len(neighbors) and len(neighbors) > 0:
+      # if n == len(neighbors):
         for x, y in neighbors:
           play(x, y, state, board, True)
         ai_player(state, board)
       for x, y in neighbors:
-        numbered_cell_neighbors[(x, y)] += n/len(neighbors)
+        numbered_cell_neighbors[(x, y)] += flags_neq_n * n/len(neighbors)
   print(len(numbered_cell_neighbors), numbered_cell_neighbors)
   if numbered_cell_neighbors:
     x, y = min(numbered_cell_neighbors, key=numbered_cell_neighbors.get)
@@ -128,7 +131,7 @@ def main():
   wins = 0
   losses = 0
   for _ in range(n):
-    if autoplay(10, 10, 10):
+    if autoplay(10, 10, 30):
       wins += 1
     else:
       losses += 1
