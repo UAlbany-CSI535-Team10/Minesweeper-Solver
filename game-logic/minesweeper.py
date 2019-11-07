@@ -106,11 +106,11 @@ def autoplay(rows, cols, n):
   # flag = False
   x, y = randint(0, rows-1), randint(0, cols-1)
   while not done:
-    print('Computer plays', (x, y))
+    print('Computer plays', (x, y), 'Mines flagged: ', state[2])
     done = play(x, y, state, board) #, flag)
     display_state(state)
     x, y = ai_player(state, board)
-    if (rows*cols - state[1]) == num_mines or state[2] == num_mines:
+    if (rows*cols - state[1]) == num_mines or state[2] >= num_mines:
       print('Winner!')
       return True
       # done = True
@@ -131,7 +131,7 @@ def main():
   wins = 0
   losses = 0
   for _ in range(n):
-    if autoplay(10, 10, 30):
+    if autoplay(10, 10, 15):
       wins += 1
     else:
       losses += 1
