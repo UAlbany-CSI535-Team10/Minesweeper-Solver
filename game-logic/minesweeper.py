@@ -1,7 +1,5 @@
 from random import randint
 import numpy as np
-from queue import PriorityQueue
-import itertools
 from collections import defaultdict 
 
 def surrounding_cells(x, y, rows, cols):
@@ -89,6 +87,7 @@ def ai_player(state, board):
   if numbered_cell_neighbors:
     x, y = min(numbered_cell_neighbors, key=numbered_cell_neighbors.get)
     return x, y
+  print('Choosing random cell')
   return randint(0, rows-1), randint(0, cols-1) # stuck, unable to choose next best cell
 
 random_fails = 0
@@ -130,8 +129,8 @@ def main():
       losses += 1
     if i>0: print(wins, losses, wins / i)
   print(wins, losses, wins/n)
-  print("Game over at first try:", random_fails)
-  print("Excluding them, win percentage:", wins/(n-random_fails))
+  print('Game over at first try:', random_fails)
+  print('Excluding them, win percentage:', wins/(n-random_fails))
 
 if __name__ == '__main__':
   main()
