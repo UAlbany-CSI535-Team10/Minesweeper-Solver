@@ -85,7 +85,7 @@ def ai_player(state, board):
         ai_player(state, board)
       for x, y in neighbors:
         numbered_cell_neighbors[(x, y)] += safe_factor * n/len(neighbors)
-  # print(len(numbered_cell_neighbors), numbered_cell_neighbors)
+  print(len(numbered_cell_neighbors), numbered_cell_neighbors)
   if numbered_cell_neighbors:
     x, y = min(numbered_cell_neighbors, key=numbered_cell_neighbors.get)
     return x, y
@@ -107,13 +107,13 @@ def autoplay(rows, cols, n):
     if done:
       print('Game Over!')
       return False
-    if (rows*cols - state[1]) == num_mines or state[2] >= num_mines:
+    if (rows*cols - state[1]) == num_mines:# or state[2] == num_mines:
       print('Winner!')
       return True
     x, y = ai_player(state, board)
 
 def main():
-  n = 100
+  n = 1
   wins = 0
   losses = 0
   for i in range(n):
@@ -121,7 +121,7 @@ def main():
       wins += 1
     else:
       losses += 1
-    print(wins, losses, wins / (i+1))
+    if i>0: print(wins, losses, wins / i)
   print(wins, losses, wins/n)
 
 if __name__ == '__main__':
