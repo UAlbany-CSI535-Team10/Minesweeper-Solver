@@ -51,9 +51,9 @@ def play(row, col, state, board, flag=False):
     if flag:
       state[2] += 1
     return True #not flag # game over only if mine clicked not flagged
-  # if flag:
-  #   print('No mine here!')
-  #   return False
+  if flag:
+    print('No mine here!')
+    return False
   queue = [[x, y]]
   while queue:
     x, y = queue.pop(0)
@@ -77,25 +77,21 @@ def ai_player(state, board):
     if state[0][i][j].isdigit():
       n = int(state[0][i][j])
       flags = [(x, y) for x, y in surrounding_cells(i, j, rows, cols) if state[0][x][y] == 'F']
-      flags_neq_n = -20 if n == len(flags) else 1
+      safe_factor = -20 if n == len(flags) else 1
       neighbors = [(x, y) for x, y in surrounding_cells(i, j, rows, cols) if state[0][x][y] == '#']
       if (n - len(flags)) == len(neighbors) and len(neighbors) > 0:
-      # if n == len(neighbors):
         for x, y in neighbors:
           play(x, y, state, board, True)
         ai_player(state, board)
       for x, y in neighbors:
-        numbered_cell_neighbors[(x, y)] += flags_neq_n * n/len(neighbors)
+        numbered_cell_neighbors[(x, y)] += safe_factor * n/len(neighbors)
   # print(len(numbered_cell_neighbors), numbered_cell_neighbors)
   if numbered_cell_neighbors:
     x, y = min(numbered_cell_neighbors, key=numbered_cell_neighbors.get)
     return x, y
-  return 0, 0
+  return randint(0, rows-1), randint(0, cols-1) # stuck, unable to choose next best cell
 
 def autoplay(rows, cols, n):
-  # rows = int(input('Enter rows: '))
-  # cols = int(input('Enter columns: '))
-  # n = int(input('Enter number of mines: '))
   board, mines = create_board(rows, cols, n)
   num_mines = len(mines)
   display_state([board])
@@ -103,40 +99,29 @@ def autoplay(rows, cols, n):
   print('-'*30)
   state = [[['#']*cols for _ in range(rows)], 0, 0] # exposed grid, number of exposed cells, flagged mines
   done = False
-  # flag = False
   x, y = randint(0, rows-1), randint(0, cols-1)
   while not done:
     print('Computer plays', (x, y), 'Mines flagged: ', state[2])
-    done = play(x, y, state, board) #, flag)
+    done = play(x, y, state, board)
     display_state(state)
-    x, y = ai_player(state, board)
+    if done:
+      print('Game Over!')
+      return False
     if (rows*cols - state[1]) == num_mines or state[2] >= num_mines:
       print('Winner!')
       return True
-      # done = True
-    elif not done:
-      pass
-      # flag = False
-      # option = input('Continue (enter \'N\' to quit)? ') #', \'F\' to flag)'
-      # if option == 'N':
-      #   break
-      # if option == 'F':
-      #   flag = True
-    else:
-      print('Game Over!')
-      return False
+    x, y = ai_player(state, board)
 
 def main():
-  n = 10
+  n = 100
   wins = 0
   losses = 0
   for i in range(n):
-    if autoplay(10, 10, 15):
+    if autoplay(10, 10, 10):
       wins += 1
     else:
       losses += 1
-    if (i%100)==0:
-      print(wins, losses, wins / n)
+    print(wins, losses, wins / (i+1))
   print(wins, losses, wins/n)
 
 if __name__ == '__main__':
