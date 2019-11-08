@@ -91,7 +91,10 @@ def ai_player(state, board):
     return x, y
   return randint(0, rows-1), randint(0, cols-1) # stuck, unable to choose next best cell
 
+random_fails = 0
+
 def autoplay(rows, cols, n):
+  global random_fails
   board, mines = create_board(rows, cols, n)
   num_mines = len(mines)
   display_state([board])
@@ -100,20 +103,24 @@ def autoplay(rows, cols, n):
   state = [[['#']*cols for _ in range(rows)], 0, 0] # exposed grid, number of exposed cells, flagged mines
   done = False
   x, y = randint(0, rows-1), randint(0, cols-1)
+  is_random_fail = True
   while not done:
     print('Computer plays', (x, y), 'Mines flagged: ', state[2])
     done = play(x, y, state, board)
     display_state(state)
     if done:
+      if is_random_fail:
+        random_fails += 1
       print('Game Over!')
       return False
     if (rows*cols - state[1]) == num_mines:# or state[2] == num_mines:
       print('Winner!')
       return True
+    is_random_fail = False
     x, y = ai_player(state, board)
 
 def main():
-  n = 1
+  n = 100
   wins = 0
   losses = 0
   for i in range(n):
@@ -123,6 +130,8 @@ def main():
       losses += 1
     if i>0: print(wins, losses, wins / i)
   print(wins, losses, wins/n)
+  print("Game over at first try:", random_fails)
+  print("Excluding them, win percentage:", wins/(n-random_fails))
 
 if __name__ == '__main__':
   main()
