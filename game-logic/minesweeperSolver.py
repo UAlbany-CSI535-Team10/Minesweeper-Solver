@@ -259,7 +259,7 @@ def surrounding_cells(x, y):
     global rows, cols
     cells = []
     for i in range(max(x-1, 0), min(x+2, rows)):
-        for j in range(max(y-1, 0), min(y+2, rows)):
+        for j in range(max(y-1, 0), min(y+2, cols)):
             if i==x and j==y:
                 continue
             cells.append([i, j])
