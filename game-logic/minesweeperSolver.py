@@ -96,18 +96,6 @@ def loadConfig():
             (config.getint("sizes", "row"+str(x)), config.getint("sizes", "cols"+str(x)),
              config.getint("sizes", "mines"+str(x))))
 
-
-#Get surrounding cells
-def surrounding_cells(x, y):
-    global rows, cols
-    cells = []
-    for i in range(max(x-1, 0), min(x+2, rows)):
-        for j in range(max(y-1, 0), min(y+2, cols)):
-            if i==x and j==y:
-                continue
-            cells.append([i, j])
-    return cells
-    
 #ramdonly generator the game to distribute the mines
 def prepareGame():
     global rows, cols, mines, field
@@ -126,9 +114,30 @@ def prepareGame():
             x = random.randint(0, rows-1)
             y = random.randint(0, cols-1)
         field[x][y] = -1
-        for i, j in surrounding_cells(x, y):
-            if field[i][j] != -1:
-                field[i][j] = int(field[i][j]) + 1
+        if x != 0:
+            if y != 0:
+                if field[x-1][y-1] != -1:
+                    field[x-1][y-1] = int(field[x-1][y-1]) + 1
+            if field[x-1][y] != -1:
+                field[x-1][y] = int(field[x-1][y]) + 1
+            if y != cols-1:
+                if field[x-1][y+1] != -1:
+                    field[x-1][y+1] = int(field[x-1][y+1]) + 1
+        if y != 0:
+            if field[x][y-1] != -1:
+                field[x][y-1] = int(field[x][y-1]) + 1
+        if y != cols-1:
+            if field[x][y+1] != -1:
+                field[x][y+1] = int(field[x][y+1]) + 1
+        if x != rows-1:
+            if y != 0:
+                if field[x+1][y-1] != -1:
+                    field[x+1][y-1] = int(field[x+1][y-1]) + 1
+            if field[x+1][y] != -1:
+                field[x+1][y] = int(field[x+1][y]) + 1
+            if y != cols-1:
+                if field[x+1][y+1] != -1:
+                    field[x+1][y+1] = int(field[x+1][y+1]) + 1
 
 def prepareWindow():
     global rows, cols, buttons
@@ -199,9 +208,22 @@ def autoClickOn(x,y):
     buttons[x][y]['state'] = 'disabled'
     #if the connect field is a empty square, just expanding
     if field[x][y] == 0:
-        for i, j in surrounding_cells(x, y):
-            autoClickOn(i, j)
-
+        if x != 0 and y != 0:
+            autoClickOn(x-1,y-1)
+        if x != 0:
+            autoClickOn(x-1,y)
+        if x != 0 and y != cols-1:
+            autoClickOn(x-1,y+1)
+        if y != 0:
+            autoClickOn(x,y-1)
+        if y != cols-1:
+            autoClickOn(x,y+1)
+        if x != rows-1 and y != 0:
+            autoClickOn(x+1,y-1)
+        if x != rows-1:
+            autoClickOn(x+1,y)
+        if x != rows-1 and y != cols-1:
+            autoClickOn(x+1,y+1)
 #Click right to flag or unflag
 def onRightClick(x,y):
     global buttons,numFlag
@@ -233,6 +255,16 @@ def checkWin():
 
 
 #AI Player
+def surrounding_cells(x, y):
+    global rows, cols
+    cells = []
+    for i in range(max(x-1, 0), min(x+2, rows)):
+        for j in range(max(y-1, 0), min(y+2, cols)):
+            if i==x and j==y:
+                continue
+            cells.append([i, j])
+    return cells
+
 def ai_player():
     global rows,cols,buttons
     numbered_cell_neighbors = defaultdict(float)
@@ -284,4 +316,3 @@ createMenu()
 prepareWindow()
 prepareGame()
 window.mainloop()
-

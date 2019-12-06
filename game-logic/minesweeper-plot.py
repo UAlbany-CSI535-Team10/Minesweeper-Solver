@@ -2,6 +2,7 @@ from random import randint
 import numpy as np
 from collections import defaultdict 
 import constraint
+import matplotlib.pyplot as plt
 
 def surrounding_cells(x, y, rows, cols):
   cells = []
@@ -151,18 +152,39 @@ def autoplay(rows, cols, n):
     #   ai_player: 11.01% overall, 13.78% excluding games over at first try
 
 def main():
-  n = 100
-  wins = 0
-  losses = 0
-  for i in range(n):
-    if autoplay(10, 10, 20):
-      wins += 1
-    else:
-      losses += 1
-    if i>0: print(wins, losses, wins / i)
-  print(wins, losses, wins/n)
-  print('Game over at first try:', random_fails)
-  print('Excluding them, win percentage:', 100*wins/(n-random_fails))
+  rates=[]
+  mines=40
+  for m in range(mines):
+      n = 200
+      wins = 0
+      losses = 0
+      for i in range(n):
+        if autoplay(10,10,m):
+          wins += 1
+        else:
+          losses += 1
+        if (i % 100) == 0 and i != 0:
+          print(wins, losses, wins / i)
+      print("total",wins, losses, wins/n)
+      rates.append(wins/n)
+  plt.plot(np.arange(mines),rates)
+  plt.ylabel("win rates over 200 trials")
+  plt.xlabel("mines")
+  plt.show()
+
+# def main():
+#   n = 100
+#   wins = 0
+#   losses = 0
+#   for i in range(n):
+#     if autoplay(10, 10, 20):
+#       wins += 1
+#     else:
+#       losses += 1
+#     if i>0: print(wins, losses, wins / i)
+#   print(wins, losses, wins/n)
+#   print('Game over at first try:', random_fails)
+#   print('Excluding them, win percentage:', 100*wins/(n-random_fails))
 
 if __name__ == '__main__':
   main()
