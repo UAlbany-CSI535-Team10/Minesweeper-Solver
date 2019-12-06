@@ -145,7 +145,7 @@ def autoplay(rows, cols, n):
       print('Winner!')
       return True
     is_random_fail = False
-    x, y = ai_player_csp(state, board)
+    x, y = ai_player(state, board)
     # For 1000 runs of 10x10 board with 20 mines
     # win percentage for
     #   ai_player_csp: 24.72% overall, 30.19% excluding games over at first try
@@ -170,7 +170,7 @@ def main():
   plt.plot(np.arange(mines),rates)
   plt.ylabel("win rates over 200 trials")
   plt.xlabel("mines")
-  plt.show()
+  plt.savefig('output.png')
 
 # def main():
 #   n = 100
