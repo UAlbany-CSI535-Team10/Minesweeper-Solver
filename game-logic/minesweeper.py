@@ -1,11 +1,12 @@
 from random import randint
 import numpy as np
 from collections import defaultdict 
+import constraint
 
 def surrounding_cells(x, y, rows, cols):
   cells = []
   for i in range(max(x-1, 0), min(x+2, rows)):
-    for j in range(max(y-1, 0), min(y+2, rows)):
+    for j in range(max(y-1, 0), min(y+2, cols)):
       if i==x and j==y:
         continue
       cells.append([i, j])
@@ -90,10 +91,50 @@ def ai_player(state, board):
   print('Choosing random cell')
   return randint(0, rows-1), randint(0, cols-1) # stuck, unable to choose next best cell
 
+num_mines = 0
+mines = []
+
+def ai_player_csp(state, board):
+  csp = constraint.Problem()
+  rows, cols = len(state[0]), len(state[0][0])
+  fringe_cells = set()
+  for i, j in np.ndindex((rows, cols)):
+    if state[0][i][j].isdigit():
+      neighbors = [(x, y) for x, y in surrounding_cells(i, j, rows, cols) if state[0][x][y] == '#']
+      fringe_cells.update(neighbors)
+      csp.addConstraint(constraint.ExactSumConstraint(int(state[0][i][j])), neighbors)
+  csp.addVariables(fringe_cells, [0, 1])
+  solutions = csp.getSolutions()
+  print(len(solutions))
+  fringe_cells = defaultdict(float)
+  for solution in solutions:
+    for cell in solution.keys():
+      fringe_cells[cell] += solution[cell]
+  psafe = min(fringe_cells, key=fringe_cells.get)
+  pmine = max(fringe_cells, key=fringe_cells.get)
+  if fringe_cells[psafe] < fringe_cells[pmine]:
+    return psafe
+  else:
+    return ai_player(state, board)
+  # soln_iter = csp.getSolutionIter()
+  # try:
+  #   while True:
+  #     solution = next(soln_iter)
+  #     # print(solution)
+  #     pmines = [pos for pos in solution.keys() if solution[pos] == 1]
+  #     amines = 0
+  #     for mine in pmines:
+  #       if mine in mines:
+  #         amines += 1
+  #     print(fringe_cells, 'Predicted Mines:', pmines, len(pmines), 'Accurate:', amines)
+  # except:
+  #   pass
+
+
 random_fails = 0
 
 def autoplay(rows, cols, n):
-  global random_fails
+  global random_fails, mines
   board, mines = create_board(rows, cols, n)
   num_mines = len(mines)
   display_state([board])
@@ -116,14 +157,18 @@ def autoplay(rows, cols, n):
       print('Winner!')
       return True
     is_random_fail = False
-    x, y = ai_player(state, board)
+    x, y = ai_player_csp(state, board)
+    # For 1000 runs of 10x10 board with 20 mines
+    # win percentage for
+    #   ai_player_csp: 24.72% overall, 30.19% excluding games over at first try
+    #   ai_player: 11.01% overall, 13.78% excluding games over at first try
 
 def main():
   n = 100
   wins = 0
   losses = 0
   for i in range(n):
-    if autoplay(10, 10, 10):
+    if autoplay(10, 10, 20):
       wins += 1
     else:
       losses += 1
